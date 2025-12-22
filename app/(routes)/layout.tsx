@@ -5,7 +5,7 @@ export default function Applayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en">
+        <html lang="en"  suppressContentEditableWarning>
             <body
             >
                 {children}

@@ -1,124 +1,72 @@
 "use client"
 
+import Header from "./header"
 import { Suggestion, Suggestions } from "@/components/ai-elements/suggestion"
 import AIPromptInput from "@/components/webcomponents/aipromptinput"
-import { useCallback, useMemo, useState } from "react"
-
-import Header from "./header"
+import { useMemo, useState } from "react"
 
 export default function LandingPage() {
   const [promptText, setPromptText] = useState("")
+  const [loading, setLoading] = useState(false)
 
-  const handleSubmitSuggestion = useCallback((val: string) => {
-    setPromptText(val)
-  }, [])
-
-  const suggestionsList = useMemo(
+  const suggestions = useMemo(
     () => [
-      {
-        label: "Finance Tracker",
-        icon: "💸",
-        value: `Finance app statistics screen. Current balance at top with dollar amount, bar chart showing spending over months (Oct-Mar) with month selector pills below, transaction list with app icons, amounts, and categories. Bottom navigation bar. Mobile app, single screen. Style: Dark theme, chunky rounded cards, playful but professional, modern sans-serif typography, Gen Z fintech vibe. Fun and fresh, not corporate.`,
-      },
-      {
-        label: "Fitness Activity",
-        icon: "🔥",
-        value: `Fitness tracker summary screen. Large central circular progress ring showing steps and calories with neon glow. Line graph showing heart rate over time. Bottom section with grid of health metrics (Sleep, Water, SpO2). Mobile app, single screen. Style: Deep Dark Mode (OLED friendly). Pitch black background with electric neon green and vibrant blue accents. High contrast, data-heavy but organized, sleek and sporty aesthetic.`,
-      },
-      {
-        label: "Food Delivery",
-        icon: "🍔",
-        value: `Food delivery home feed. Top search bar with location pin. Horizontal scrolling hero carousel of daily deals. Vertical list of restaurants with large delicious food thumbnails, delivery time badges, and rating stars. Floating Action Button (FAB) for cart. Mobile app, single screen. Style: Vibrant and Appetizing. Warm colors (orange, red, yellow), rounded card corners, subtle drop shadows to create depth. Friendly and inviting UI.`,
-      },
-      {
-        label: "Travel Booking",
-        icon: "✈️",
-        value: `Travel destination detail screen. Full-screen immersive photography of a tropical beach. Bottom sheet overlay with rounded top corners containing hotel title, star rating, price per night, and a large "Book Now" button. Horizontal scroll of amenity icons. Mobile app, single screen. Style: Minimalist Luxury. ample whitespace, elegant serif typography for headings, clean sans-serif for body text. Sophisticated, airy, high-end travel vibe.`,
-      },
-      {
-        label: "E-Commerce",
-        icon: "👟",
-        value: `Sneaker product page. Large high-quality product image on a light gray background. Color selector swatches, size selector grid, and a sticky "Add to Cart" button at the bottom. Title and price in bold, oversized typography. Mobile app, single screen. Style: Neo-Brutalism. High contrast, thick black outlines on buttons and cards, hard shadows (no blur), unrefined geometry, bold solid colors (yellow and black). Trendy streetwear aesthetic.`,
-      },
-      {
-        label: "Meditation",
-        icon: "🧘",
-        value: `Meditation player screen. Central focus is a soft, abstract breathing bubble animation. Play/Pause controls and a time slider below. Background is a soothing solid pastel sage green. Mobile app, single screen. Style: Soft Minimal. Rounded corners on everything, low contrast text for relaxation, pastel color palette, very little UI clutter. Zen, calming, and therapeutic atmosphere.`,
-      },
+      { label: "Finance Tracker", icon: "💸", value: "Design a finance tracker app..." },
+      { label: "Fitness Activity", icon: "🔥", value: "Design a fitness activity app..." },
+      { label: "Food Delivery", icon: "🍔", value: "Design a food delivery app..." },
+      { label: "Travel Booking", icon: "✈️", value: "Design a travel booking app..." },
+      { label: "E-Commerce", icon: "🛒", value: "Design an ecommerce app..." },
+      { label: "Meditation", icon: "🧘", value: "Design a meditation app..." },
     ],
     []
   )
 
+  const handleSubmit = () => {
+    setLoading(true)
+    console.log("Prompt:", promptText)
+    setTimeout(() => setLoading(false), 1000)
+  }
+
   return (
-    <main className="relative flex min-h-screen w-full flex-col items-center justify-center px-4 py-8">
-      <div className="mx-auto flex w-full max-w-4xl flex-col items-center justify-center gap-8">
-        <Header />
+    <>
+      <Header />
 
-        {/* Hero */}
-        <section className="w-full space-y-6 text-center">
-          <div className="space-y-4">
-            <h1 className="text-center text-4xl font-semibold tracking-tight sm:text-5xl">
-              Design Mobile App <br className="md:hidden" />
-              <span className="mx-auto mt-2 block max-w-2xl text-center font-medium leading-relaxed text-foreground">
-                in minutes
-              </span>
+      <main className="relative flex min-h-screen flex-col items-center justify-center px-4">
+        <div className="mx-auto w-full max-w-4xl space-y-10 text-center">
+
+          {/* Hero */}
+          <section className="space-y-4">
+            <h1 className="text-4xl font-semibold sm:text-5xl lg:text-6xl">
+              Design mobile apps <br />
+              <span className="text-primary">in minutes</span>
             </h1>
-            <p className="mx-auto max-w-2xl text-center text-base font-medium leading-relaxed text-foreground sm:text-lg">
-              Go from idea to a beautiful app in minutes by prompting AI.
-            </p>
-          </div>
-        </section>
 
-        {/* Prompt input */}
-        <div className="relative z-50 flex w-full max-w-3xl flex-col items-center gap-6">
-          <div className="w-full">
-            <AIPromptInput
-              className="ring-2 ring-primary"
-              prompt={promptText}
-              setPromptText={setPromptText}
-              isLoading={false}
-              onSubmit={() => {}}
-              hiddenSubmitBtn={true}
-            />
-          </div>
+            <p className="mx-auto max-w-2xl text-muted-foreground">
+              Go from idea to beautiful app mockups in minutes by chatting with AI.
+            </p>
+          </section>
+
+          {/* Prompt */}
+          <AIPromptInput
+            prompt={promptText}
+            setPromptText={setPromptText}
+            isLoading={loading}
+            onSubmit={handleSubmit}
+          />
 
           {/* Suggestions */}
-          <div className='w-full flex justify-center'>
-            <Suggestions className="w-full">
-              {suggestionsList.map((s) => (
-                <Suggestion 
-                  key={s.label} 
-                  suggestion={s.value} 
-                  className='text-xs h-7 px-2.5 py-1'
-                  onClick={() => { handleSubmitSuggestion(s.value) }}
-                >
-                  {s.icon}
-                  <span className="ml-1">{s.label}</span>
-                </Suggestion>
-              ))}
-            </Suggestions>
-          </div>
-        </div>
+          <Suggestions>
+            {suggestions.map((s) => (
+              <Suggestion
+                key={s.label}
+                onClick={() => setPromptText(s.value)} suggestion={""}              >
+                {s.icon} {s.label}
+              </Suggestion>
+            ))}
+          </Suggestions>
 
-        {/* Background Effect */}
-        <div className="absolute -translate-x-1/2 left-1/2 w-312.5 h-187.5 top-[80%] -z-10">
-          <div className="-translate-x-1/2 absolute bottom-[calc(100%-300px)] left-1/2 h-125 w-125 opacity-20 bg-radial-primary"></div>
-          <div className="absolute -mt-2.5 size-full rounded-[50%] bg-primary/20 opacity-70 [box-shadow:0_-15px_24.8px_var(--primary)]"></div>
-          <div className="absolute z-0 size-full rounded-[50%] bg-background"></div>
         </div>
-
-        {/* Recent Projects Section */}
-        <div className='w-full max-w-3xl pt-8 border-t border-border'>
-          <div className='text-center'>
-            <h1 className='text-2xl font-semibold tracking-tight'>
-              Recent Projects
-            </h1>
-            <p className='text-muted-foreground mt-2'>
-              Your recently created app designs will appear here
-            </p>
-          </div>
-        </div>
-      </div>
-    </main>
+      </main>
+    </>
   )
 }

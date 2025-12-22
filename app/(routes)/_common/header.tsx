@@ -1,50 +1,61 @@
-"use client"
+"use client";
 
 import { Button } from "@/components/ui/button";
 import Logo from "@/components/webcomponents/Logo";
-import { cn } from "@/lib/utils";
 import { MoonIcon, SunIcon } from "lucide-react";
-import { useTheme } from "next-themes"
+import { useTheme } from "next-themes";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
+import { LoginLink } from "@kinde-oss/kinde-auth-nextjs/components";
 
 export default function Header() {
-  const { theme, setTheme } = useTheme()
-
+  const { theme, setTheme } = useTheme();
   const isDark = theme === "dark";
 
-
-
-
-
-
   return (
-    <div className="sticky top-0 right-0 left-0 z-30">
-      <header className="h-16 border-b bg-background py-4">
-        <div className="w-full max-w-7xl mx-auto flex items-center justify-between p-4">
-          <Logo />
+    <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
+        {/* Logo */}
+        <Logo />
 
+        {/* Center Nav */}
+        <nav className="hidden md:flex">
+          <Link
+            href="/"
+            className="text-sm font-medium text-muted-foreground hover:text-foreground transition"
+          >
+            Home
+          </Link>
+        </nav>
 
-          <div className="flex-1 items-center justify-center gap-8 md:flex">
-            <Link href={"/"} className="text-muted-foreground text-sm">Home</Link>
-          </div>
+        {/* Right */}
+        <div className="flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setTheme(isDark ? "light" : "dark")}
+            className="relative"
+          >
+            <SunIcon
+              className={cn(
+                "absolute size-4 transition-all",
+                isDark ? "scale-100 opacity-100" : "scale-0 opacity-0"
+              )}
+            />
+            <MoonIcon
+              className={cn(
+                "absolute size-4 transition-all",
+                isDark ? "scale-0 opacity-0" : "scale-100 opacity-100"
+              )}
+            />
+          </Button>
 
-          <div className="flex flex-1 items-center justify-end gap-3">
-            <Button variant={"outline"} size={"icon"} onClick={() => setTheme(isDark ? "light" : "dark")} className="relative rounded-full w-8">
-              <SunIcon className={cn("size-5 absolute transition", (
-                isDark ? "scale-100" : "scale-0"
-              ))} />
-              <MoonIcon className={cn("size-5 absolute transition", (
-                isDark ? "scale-0" : "scale-100"
-              ))} />
-
-
-            </Button>
-          </div>
-
+          <LoginLink>
+            {" "}
+            <Button className="rounded-full px-5">Sign in</Button>
+          </LoginLink>
         </div>
-
-      </header>
-
-    </div>
-  )
+      </div>
+    </header>
+  );
 }

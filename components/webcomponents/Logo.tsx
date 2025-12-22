@@ -1,14 +1,14 @@
-import Link from "next/link";
+import Link from "next/link"
 
 export default function Logo() {
   return (
     <Link
       href="/"
-      aria-label="Larva Design.ai Home"
-      className="flex items-center gap-2 text-2xl font-bold"
+      aria-label="Design.ai Home"
+      className="flex items-center gap-1 text-xl font-semibold"
     >
-      <span className="text-primary">Larva</span>
-      <span>Design.ai</span>
+      <span className="text-primary">X</span>
+      <span>design.ai</span>
     </Link>
   )
 }

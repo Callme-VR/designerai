@@ -1,57 +1,51 @@
 "use client"
 
-import { cn } from "@/lib/utils"
-import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupTextarea } from "../ui/input-group"
-import { Spinner } from "../ui/spinner"
 import { CornerDownLeftIcon } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { Spinner } from "../ui/spinner"
 
-interface AIPromptInputProps {
-  className?: string
+interface Props {
   prompt: string
-  setPromptText: (value: string) => void
+  setPromptText: (v: string) => void
   isLoading: boolean
-  hiddenSubmitBtn: boolean
   onSubmit: () => void
+  className?: string
 }
 
 export default function AIPromptInput({
-  className,
   prompt,
   setPromptText,
   isLoading,
-  hiddenSubmitBtn,
   onSubmit,
-}: AIPromptInputProps) {
+  className,
+}: Props) {
   return (
-    <div className="bg-background">
-      <InputGroup className={cn("min-h-[172px] rounded-3xl bg-background", className)}>
-        <InputGroupTextarea
-          className="py-2.5 text-base"
-          placeholder="Describe the app you want to design…"
-          value={prompt}
-          onChange={(e) => setPromptText(e.target.value)}
-          aria-label="App design prompt"
-        />
+    <div className="relative w-full">
+      <textarea
+        className={cn(
+          "min-h-[160px] w-full resize-none rounded-3xl border bg-background px-5 py-4 pr-28 text-base outline-none focus:ring-2 focus:ring-primary",
+          className
+        )}
+        placeholder="I want to design an app that..."
+        value={prompt}
+        onChange={(e) => setPromptText(e.target.value)}
+      />
 
-        <InputGroupAddon className="flex items-center justify-end" align="block-end">
-          {!hiddenSubmitBtn && (
-            <InputGroupButton
-              size="sm"
-              disabled={!prompt?.trim() || isLoading}
-              onClick={onSubmit}
-            >
-              {isLoading ? (
-                <Spinner className="size-5" />
-              ) : (
-                <>
-                  Design
-                  <CornerDownLeftIcon className="size-5" />
-                </>
-              )}
-            </InputGroupButton>
-          )}
-        </InputGroupAddon>
-      </InputGroup>
+      {/* Design Button */}
+      <button
+        onClick={onSubmit}
+        disabled={!prompt.trim() || isLoading}
+        className="absolute bottom-4 right-4 flex items-center gap-1 rounded-full bg-primary px-4 py-2 text-sm font-medium text-white shadow hover:opacity-90 disabled:opacity-50"
+      >
+        {isLoading ? (
+          <Spinner className="size-4" />
+        ) : (
+          <>
+            Design
+            <CornerDownLeftIcon className="size-4" />
+          </>
+        )}
+      </button>
     </div>
   )
 }
