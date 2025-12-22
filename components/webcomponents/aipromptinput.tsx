@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils"
 import { Spinner } from "../ui/spinner"
 
 interface Props {
-  prompt: string
+  prompt: string | undefined
   setPromptText: (v: string) => void
   isLoading: boolean
   onSubmit: () => void
@@ -27,14 +27,14 @@ export default function AIPromptInput({
           className
         )}
         placeholder="I want to design an app that..."
-        value={prompt}
+        value={prompt || ""}
         onChange={(e) => setPromptText(e.target.value)}
       />
 
       {/* Design Button */}
       <button
         onClick={onSubmit}
-        disabled={!prompt.trim() || isLoading}
+        disabled={!prompt?.trim() || isLoading}
         className="absolute bottom-4 right-4 flex items-center gap-1 rounded-full bg-primary px-4 py-2 text-sm font-medium text-white shadow hover:opacity-90 disabled:opacity-50"
       >
         {isLoading ? (

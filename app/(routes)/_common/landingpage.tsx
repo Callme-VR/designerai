@@ -5,21 +5,18 @@ import { Suggestion, Suggestions } from "@/components/ai-elements/suggestion";
 import AIPromptInput from "@/components/webcomponents/aipromptinput";
 import { useCreateProject, useGetProject } from "@/features/use-project";
 import { useMemo, useState } from "react";
-import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs/client";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { Clock, ArrowRight } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { Spinner } from "@/components/ui/spinner";
+import { ProjectType } from "@/types/project";
+import ProjectCard from "@/components/webcomponents/ProjectCard";
+import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
 
 export default function LandingPage() {
-  const user = useKindeBrowserClient();
   const [promptText, setPromptText] = useState("");
   const { mutate, isPending } = useCreateProject();
-
-  const userId = user?.id;
-
-  const { data: projects, isLoading, isError } = useGetProject(userId);
-
+  const { user } = useKindeBrowserClient();
+  const userId=user?.id;
+  const { data: projects, isLoading } = useGetProject(userId || "");
 
   const handleSubmit = () => {
     if (!promptText) return;
@@ -90,12 +87,36 @@ export default function LandingPage() {
               <Suggestion
                 key={s.label}
                 onClick={() => handleSuggestion(s.value)}
-                suggestion={""}
+                suggestion={s.value}
               >
                 {s.icon} {s.label}
               </Suggestion>
             ))}
           </Suggestions>
+        </div>
+        <Separator className="w-fit size-1 mt-7" />
+
+        <div className="w-full py-10">
+          <div className="mx-auto max-w-3xl">
+            {projects && (
+              <div>
+                <h1 className="tracking-tighter font-bold text-2xl text-center">
+                  Recent Projects
+                </h1>
+                {isLoading ? (
+                  <div className="flex items-center justify-center py-2">
+                    <Spinner className="size-10" />
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 mt-3">
+                    {projects?.map((project: ProjectType) => (
+                      <ProjectCard key={project.id} project={project} />
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </main>
     </>

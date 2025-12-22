@@ -58,7 +58,7 @@ export async function GET(request: Request) {
       },
       take: 15,
       orderBy: {
-        createdAt: "desc"
+        updatedAt: "desc"
       }
     })
 
