@@ -1,15 +1,16 @@
-"use client"
+"use client";
 
-import { CornerDownLeftIcon } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { Spinner } from "../ui/spinner"
+import { CornerDownLeftIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Spinner } from "../ui/spinner";
 
 interface Props {
-  prompt: string | undefined
-  setPromptText: (v: string) => void
-  isLoading: boolean
-  onSubmit: () => void
-  className?: string
+  prompt: string | undefined;
+  setPromptText: (v: string) => void;
+  isLoading: boolean;
+  onSubmit: () => void;
+  hideSubmitBtn?: boolean;
+  className?: string;
 }
 
 export default function AIPromptInput({
@@ -18,6 +19,7 @@ export default function AIPromptInput({
   isLoading,
   onSubmit,
   className,
+  hideSubmitBtn = false,
 }: Props) {
   return (
     <div className="relative w-full">
@@ -47,5 +49,5 @@ export default function AIPromptInput({
         )}
       </button>
     </div>
-  )
+  );
 }

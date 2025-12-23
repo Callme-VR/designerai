@@ -2,16 +2,17 @@
 
 import CanvasPage from "@/components/canvas";
 import SignelPageheader from "@/components/webcomponents/SignelPageheader";
+import CanvasProvider from "@/context/canvas-provider";
 import { useGetProjectById } from "@/features/use-project-id";
 import { useParams } from "next/navigation";
 
 export default function Page() {
   const params = useParams();
   const id = params.id as string;
-  const hasInitialData = frames.length > 0;
   const { data: project, isPending } = useGetProjectById(id);
-  const frames = project?.frames || "";
-  const theme = project?.theme || "";
+  const frames = project?.frames || [];
+  const themeId = project?.theme || "";
+  const hasInitialData = frames.length > 0;
 
   if (!isPending && !project) {
     return <div>Project not found </div>;
@@ -23,13 +24,17 @@ export default function Page() {
 
       <CanvasProvider
         initialFrames={frames}
-        initialTheme={theme}
+        initialThemeId={themeId}
         hasInitialData={hasInitialData}
         projectId={project?.id}
       >
         <div className="flex w-full overflow-hidden">
-          <div className="relative"></div>
-          <CanvasPage />
+          <div className="relative flex-1"></div>
+          <CanvasPage 
+            projectId={id}
+            isPending={isPending}
+            projectName={project?.name || 'Untitled Project'}
+          />
         </div>
       </CanvasProvider>
     </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import Logo from "@/components/webcomponents/Logo";
 import { LogOutIcon, MoonIcon, SunIcon } from "lucide-react";
 import { useTheme } from "next-themes";
@@ -33,7 +33,7 @@ export default function Header() {
         <nav className="hidden md:flex">
           <Link
             href="/"
-            className="text-sm font-medium text-muted-foreground hover:text-foreground transition"
+            className={buttonVariants({ variant: "ghost" })}
           >
             Home
           </Link>
@@ -45,7 +45,7 @@ export default function Header() {
             variant="ghost"
             size="icon"
             onClick={() => setTheme(isDark ? "light" : "dark")}
-            className="relative"
+            className="relative cursor-pointer"
           >
             <SunIcon
               className={cn(
@@ -91,7 +91,7 @@ export default function Header() {
           ) : (
             <LoginLink>
               {" "}
-              <Button className="rounded-full px-5">Sign in</Button>
+              <Button className="rounded-full px-5 cursor-pointer">Sign in</Button>
             </LoginLink>
           )} 
         </div>
