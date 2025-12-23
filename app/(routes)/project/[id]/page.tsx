@@ -8,7 +8,7 @@ import { useParams } from "next/navigation";
 export default function Page() {
   const params = useParams();
   const id = params.id as string;
-
+  const hasInitialData = frames.length > 0;
   const { data: project, isPending } = useGetProjectById(id);
   const frames = project?.frames || "";
   const theme = project?.theme || "";
@@ -19,15 +19,19 @@ export default function Page() {
 
   return (
     <div className="relative h-screen w-full flex flex-col">
-      <SignelPageheader projectName={project?.name}/>
+      <SignelPageheader projectName={project?.name} />
 
-
-      <div className="flex w-full overflow-hidden">
-        <div className="relative">
-
+      <CanvasProvider
+        initialFrames={frames}
+        initialTheme={theme}
+        hasInitialData={hasInitialData}
+        projectId={project?.id}
+      >
+        <div className="flex w-full overflow-hidden">
+          <div className="relative"></div>
+          <CanvasPage />
         </div>
-        <CanvasPage />
-      </div>
+      </CanvasProvider>
     </div>
-  )
+  );
 }
