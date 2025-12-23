@@ -2,7 +2,6 @@
 
 import CanvasPage from "@/components/canvas";
 import SignelPageheader from "@/components/webcomponents/SignelPageheader";
-import CanvasProvider from "@/context/canvas-provider";
 import { useGetProjectById } from "@/features/use-project-id";
 import { useParams } from "next/navigation";
 
@@ -22,21 +21,16 @@ export default function Page() {
     <div className="relative h-screen w-full flex flex-col">
       <SignelPageheader projectName={project?.name} />
 
-      <CanvasProvider
-        initialFrames={frames}
-        initialThemeId={themeId}
-        hasInitialData={hasInitialData}
-        projectId={project?.id}
-      >
-        <div className="flex w-full overflow-hidden">
-          <div className="relative flex-1"></div>
-          <CanvasPage 
-            projectId={id}
-            isPending={isPending}
-            projectName={project?.name || 'Untitled Project'}
-          />
-        </div>
-      </CanvasProvider>
+      <div className="flex-1 w-full overflow-hidden">
+        <CanvasPage
+          projectId={id}
+          isPending={isPending}
+          projectName={project?.name || "Untitled Project"}
+          initialFrames={frames}
+          initialThemeId={themeId}
+          hasInitialData={hasInitialData}
+        />
+      </div>
     </div>
   );
 }

@@ -6,22 +6,33 @@ import { Spinner } from "../ui/spinner";
 import { parseThemeColors } from "@/lib/themes";
 import { useState } from "react";
 import { TOOL_MODE_ENUM, ToolModeType } from "@/constant/canvas/canvas";
-import {
-  TransformWrapper,
-  TransformComponent,
-  ReactZoomPanPinchContentRef,
-} from "react-zoom-pan-pinch";
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import CanvasControl from "./CanvasControl";
+import { FrameType } from "@/types/project";
 
 interface CanvasPageProps {
   projectId: string;
   isPending: boolean;
   projectName: string;
+  initialFrames?: FrameType[];
+  initialThemeId?: string;
+  hasInitialData?: boolean;
 }
 
-export default function CanvasPage({ projectId, isPending }: CanvasPageProps) {
+export default function CanvasPage({
+  projectId,
+  isPending,
+  initialFrames = [],
+  initialThemeId,
+  hasInitialData = false,
+}: CanvasPageProps) {
   return (
-    <CanvasProvider projectId={projectId}>
+    <CanvasProvider
+      projectId={projectId}
+      initialFrames={initialFrames}
+      initialThemeId={initialThemeId}
+      hasInitialData={hasInitialData}
+    >
       <CanvasPageContent isPending={isPending} />
     </CanvasProvider>
   );
@@ -33,9 +44,10 @@ function CanvasPageContent({ isPending }: { isPending: boolean }) {
   const [toolMode, setToolMode] = useState<ToolModeType>(TOOL_MODE_ENUM.SELECT);
   const [zoomPercent, setZoomPercent] = useState(58);
 
+  // Only show loader for AI generation/analysis, not for normal viewing
   const currentStatus = isPending
     ? "Fetching"
-    : loadingStatus !== "idle" && loadingStatus !== "completed"
+    : loadingStatus === "analyzing" || loadingStatus === "generating"
     ? loadingStatus
     : null;
 
@@ -67,8 +79,8 @@ function CanvasPageContent({ isPending }: { isPending: boolean }) {
         panning={{
           disabled: toolMode !== TOOL_MODE_ENUM.HAND,
         }}
-        onTransformed={(ref: ReactZoomPanPinchContentRef) => {
-          setZoomPercent(Math.round(100));
+        onTransformed={(ref) => {
+          setZoomPercent(Math.round(ref.instance.transformState.scale * 100));
         }}
       >
         {({ zoomIn, zoomOut }) => (
@@ -86,7 +98,7 @@ function CanvasPageContent({ isPending }: { isPending: boolean }) {
             >
               <div
                 className={cn(
-                  "absolute inset-0 h-full w-full p-3",
+                  "w-[3000px] h-[3000px]",
                   toolMode === TOOL_MODE_ENUM.HAND
                     ? "cursor-grab active:cursor-grabbing"
                     : "cursor-default"
@@ -99,6 +111,9 @@ function CanvasPageContent({ isPending }: { isPending: boolean }) {
                       } 1px, transparent 1px)`
                     : "radial-gradient(circle, var(--primary) 1px, transparent 1px)",
                   backgroundSize: "20px 20px",
+                  backgroundColor: theme
+                    ? parseThemeColors(theme.style)?.background ?? "#f8f9fa"
+                    : "#f8f9fa",
                 }}
               />
             </TransformComponent>
@@ -121,7 +136,7 @@ function CanvasLoader({ status }: { status: string }) {
   return (
     <div
       className={cn(
-        "absolute top-4 left-1/2 z-50 -translate-x-1/2 rounded-bl-xl rounded-br-xl px-4 py-2 shadow-md flex items-center gap-2",
+        "absolute top-28 left-1/2 z-50 -translate-x-1/2 rounded-xl px-4 py-2 shadow-md flex items-center gap-2",
         status === "Fetching"
           ? "bg-gray-700 text-white"
           : "bg-gray-200 text-gray-800"

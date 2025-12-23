@@ -15,7 +15,7 @@ export default function LandingPage() {
   const [promptText, setPromptText] = useState("");
   const { mutate, isPending } = useCreateProject();
   const { user } = useKindeBrowserClient();
-  const userId=user?.id;
+  const userId = user?.id;
   const { data: projects, isLoading } = useGetProject(userId || "");
 
   const handleSubmit = () => {
@@ -96,8 +96,8 @@ export default function LandingPage() {
         </div>
         <Separator className="w-fit size-1 mt-7" />
 
-        <div className="w-full py-10">
-          <div className="mx-auto max-w-3xl">
+        <div className="w-full py-12">
+          <div className="mx-auto max-w-4xl px-4">
             {projects && (
               <div>
                 <h1 className="tracking-tighter font-bold text-2xl text-center">
@@ -108,7 +108,7 @@ export default function LandingPage() {
                     <Spinner className="size-10" />
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 mt-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-6">
                     {projects?.map((project: ProjectType) => (
                       <ProjectCard key={project.id} project={project} />
                     ))}

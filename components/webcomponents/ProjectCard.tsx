@@ -18,30 +18,29 @@ export default function ProjectCard({ project }: { project: ProjectType }) {
   return (
     <div
       role="button"
-      className="w-full flex flex-col rounded-xl cursor-pointer hover:shadow-md overflow-hidden"
+      className="w-full flex flex-col rounded-xl cursor-pointer border border-border/50 bg-card hover:shadow-lg hover:border-border transition-all duration-200 overflow-hidden group"
       onClick={onRoute}
     >
-      <div className="h-40 bg-[#eee] relative overflow-hidden flex items-center justify-center">
+      <div className="h-40 bg-muted/50 relative overflow-hidden flex items-center justify-center">
         {thumbnail ? (
           <img
             src={thumbnail}
-            className="w-full h-full object-cover object-left scale-110 transition-all duration-300"
+            alt={project.name}
+            className="w-full h-full object-cover object-left group-hover:scale-105 transition-transform duration-300"
           />
         ) : (
-          <div className="w-16 h-16 bg-primary/100 scale-110 transition-all duration-300 rounded-full flex items-center justify-center">
-            <FolderOpenDotIcon />
+          <div className="w-16 h-16 bg-primary/10 group-hover:scale-110 transition-all duration-300 rounded-full flex items-center justify-center">
+            <FolderOpenDotIcon className="size-8 text-primary" />
           </div>
         )}
       </div>
 
-      <div className="p-4 flex flex-col">
-        <h3 className="font-semibold text-sm truncate w-full mb-1 line-clamp-1">
+      <div className="p-4 flex flex-col gap-1">
+        <h3 className="font-semibold text-sm truncate w-full line-clamp-1">
           {project.name}
         </h3>
 
-        <p className="text-xs text-muted-foreground">
-          {timeAgo}
-        </p>
+        <p className="text-xs text-muted-foreground">{timeAgo}</p>
       </div>
     </div>
   );
