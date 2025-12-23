@@ -8,6 +8,7 @@ import { useState } from "react";
 import { TOOL_MODE_ENUM, ToolModeType } from "@/constant/canvas/canvas";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import CanvasControl from "./CanvasControl";
+import DeviceFrames from "./device-frame";
 import { FrameType } from "@/types/project";
 
 interface CanvasPageProps {
@@ -39,7 +40,7 @@ export default function CanvasPage({
 }
 
 function CanvasPageContent({ isPending }: { isPending: boolean }) {
-  const { loadingStatus, theme } = useCanvas();
+  const { loadingStatus, theme, frames } = useCanvas();
 
   const [toolMode, setToolMode] = useState<ToolModeType>(TOOL_MODE_ENUM.SELECT);
   const [zoomPercent, setZoomPercent] = useState(58);
@@ -98,7 +99,7 @@ function CanvasPageContent({ isPending }: { isPending: boolean }) {
             >
               <div
                 className={cn(
-                  "w-[3000px] h-[3000px]",
+                  "w-[3000px] h-[3000px] relative",
                   toolMode === TOOL_MODE_ENUM.HAND
                     ? "cursor-grab active:cursor-grabbing"
                     : "cursor-default"
@@ -115,7 +116,20 @@ function CanvasPageContent({ isPending }: { isPending: boolean }) {
                     ? parseThemeColors(theme.style)?.background ?? "#f8f9fa"
                     : "#f8f9fa",
                 }}
-              />
+              >
+                {frames.map((frame, index) => (
+                  <DeviceFrames
+                    key={frame.id}
+                    frameId={frame.id}
+                    html={frame.htmlContent}
+                    title={frame.name}
+                    initialPosition={{ x: 100 + index * 450, y: 100 }}
+                    scale={zoomPercent / 100}
+                    toolMode={toolMode}
+                    theme_style={theme?.style}
+                  />
+                ))}
+              </div>
             </TransformComponent>
 
             <CanvasControl
