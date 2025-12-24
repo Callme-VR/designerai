@@ -1,16 +1,11 @@
-
 export default function Applayout({
-    children,
+  children,
 }: Readonly<{
-    children: React.ReactNode;
+  children: React.ReactNode;
 }>) {
-    return (
-        <html lang="en"  suppressContentEditableWarning>
-            <body
-            >
-                {children}
-            </body>
-        </html>
-    );
+  return (
+    <html lang="en" suppressContentEditableWarning>
+      <body className="w-full h-auto">{children}</body>
+    </html>
+  );
 }
-    

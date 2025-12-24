@@ -5,7 +5,6 @@ import {
   ReactNode,
   useCallback,
   useContext,
-  useEffect,
   useState,
 } from "react";
 
@@ -29,6 +28,7 @@ interface CanvasContextType {
   selectedFrame: FrameType | null;
   setSelectedFrameId: (id: string | null) => void;
   loadingStatus: LoadingStatusType;
+  setLoadingStatus: (status: LoadingStatusType) => void;
 }
 
 export const CanvasContext = createContext<CanvasContextType | undefined>(
@@ -51,7 +51,7 @@ export default function CanvasProvider({
   const [themeId, setThemeId] = useState<string>(
     initialThemeId || THEME_LIST[0].id
   );
-  const [frames, setFrames] = useState<FrameType[]>(initialFrames || []);
+  const [frames, setFrames] = useState<FrameType[]>(initialFrames);
   const [selectedFrameId, setSelectedFrameId] = useState<string | null>(null);
   const [loadingStatus, setLoadingStatus] = useState<LoadingStatusType>(
     hasInitialData ? "idle" : "running"
@@ -59,7 +59,7 @@ export default function CanvasProvider({
 
   const theme = THEME_LIST.find((t) => t.id === themeId);
   const selectedFrame =
-    frames.find((frame) => frame.id === selectedFrameId) || null;
+    frames.find((frame) => frame.id === selectedFrameId) ?? null;
 
   const setTheme = useCallback((id: string) => {
     setThemeId(id);
@@ -77,29 +77,30 @@ export default function CanvasProvider({
     );
   }, []);
 
-  const value = {
-    theme,
-    setTheme,
-    themes: THEME_LIST,
-    frames,
-    setFrames,
-    updateFrame,
-    addFrame,
-    selectedFrameId,
-    selectedFrame,
-    setSelectedFrameId,
-    loadingStatus,
-  };
-
   return (
-    <CanvasContext.Provider value={value}>{children}</CanvasContext.Provider>
+    <CanvasContext.Provider
+      value={{
+        theme,
+        themes: THEME_LIST,
+        setTheme,
+        frames,
+        setFrames,
+        updateFrame,
+        addFrame,
+        selectedFrameId,
+        selectedFrame,
+        setSelectedFrameId,
+        loadingStatus,
+        setLoadingStatus,
+      }}
+    >
+      {children}
+    </CanvasContext.Provider>
   );
 }
+
 export const useCanvas = () => {
   const ctx = useContext(CanvasContext);
   if (!ctx) throw new Error("useCanvas must be used within CanvasProvider");
   return ctx;
 };
-
-// Keep backward compatibility
-export const useConvas = useCanvas;

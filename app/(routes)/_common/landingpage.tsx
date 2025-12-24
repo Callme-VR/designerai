@@ -12,7 +12,7 @@ import ProjectCard from "@/components/webcomponents/ProjectCard";
 import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
 
 export default function LandingPage() {
-  const [promptText, setPromptText] = useState("");
+  const [promptText, setPromptText] = useState<string>("");
   const { mutate, isPending } = useCreateProject();
   const { user } = useKindeBrowserClient();
   const userId = user?.id;
@@ -73,13 +73,15 @@ export default function LandingPage() {
             </p>
           </section>
 
-          {/* Prompt */}
-          <AIPromptInput
-            prompt={promptText}
-            setPromptText={setPromptText}
-            isLoading={isPending}
-            onSubmit={handleSubmit}
-          />
+          <div className="w-full">
+            {/* Prompt */}
+            <AIPromptInput
+              prompt={promptText}
+              setPromptText={setPromptText}
+              isLoading={isPending}
+              onSubmit={handleSubmit}
+            />
+          </div>
 
           {/* Suggestions */}
           <Suggestions>

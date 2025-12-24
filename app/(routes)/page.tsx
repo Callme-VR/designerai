@@ -1,5 +1,9 @@
 import Landingpage from "./_common/landingpage";
 
-export default function Homepage(){
-  return <Landingpage/>
+export default function Homepage() {
+  return (
+    <div>
+      <Landingpage />
+    </div>
+  );
 }
