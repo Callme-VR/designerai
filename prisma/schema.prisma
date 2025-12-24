@@ -19,9 +19,10 @@ model project {
   name      String
   theme     String?
   thumnails String?
+  frames    Frames[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  frames    Frames[]
 }
 
 model Frames {

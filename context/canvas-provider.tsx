@@ -46,7 +46,7 @@ export default function CanvasProvider({
   initialThemeId?: string;
   initialFrames?: FrameType[];
   hasInitialData?: boolean;
-  projectId: string;
+  projectId: string | null;
 }) {
   const [themeId, setThemeId] = useState<string>(
     initialThemeId || THEME_LIST[0].id
@@ -56,6 +56,15 @@ export default function CanvasProvider({
   const [loadingStatus, setLoadingStatus] = useState<LoadingStatusType>(
     hasInitialData ? "idle" : "running"
   );
+
+  const [prevProjectId, setPrevProjectId] = useState(projectId);
+  if (projectId !== prevProjectId) {
+    setPrevProjectId(projectId);
+    setFrames(initialFrames);
+    setThemeId(initialThemeId || THEME_LIST[0].id);
+    setSelectedFrameId(null);
+    // setLoadingStatus("running");
+  }
 
   const theme = THEME_LIST.find((t) => t.id === themeId);
   const selectedFrame =

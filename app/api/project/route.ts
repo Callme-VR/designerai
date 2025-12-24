@@ -1,4 +1,5 @@
 import { generateProjectName } from "@/app/actions/action";
+import { inngest } from "@/inngest/client";
 import prisma from "@/lib/prisma";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { NextResponse } from "next/server";
@@ -26,6 +27,20 @@ export async function POST(request: Request) {
         name: projectName,
       },
     });
+
+    try {
+      await inngest.send({
+        name: "ui/generate-screen",
+        data: {
+          userId: user.id,
+          projectId: project.id,
+          prompt,
+        },
+      });
+    } catch (error) {
+      console.error("Failed to trigger inngest function:", error);
+    }
+    // trigger inngest function
 
     return NextResponse.json({
       success: true,
