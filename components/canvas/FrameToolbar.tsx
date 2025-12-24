@@ -1,3 +1,4 @@
+"use client";
 import { cn } from "@/lib/utils";
 import { CodeIcon, DownloadIcon, GripVertical } from "lucide-react";
 import { Separator } from "../ui/separator";

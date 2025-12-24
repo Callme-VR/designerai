@@ -1,53 +1,75 @@
 "use client";
 
-import { CornerDownLeftIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+import { CornerDownLeftIcon } from "lucide-react";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupTextarea,
+} from "../ui/input-group";
 import { Spinner } from "../ui/spinner";
 
-interface Props {
-  prompt: string | undefined;
-  setPromptText: (v: string) => void;
-  isLoading: boolean;
-  onSubmit: () => void;
-  hideSubmitBtn?: boolean;
+interface PropsType {
+  promptText: string;
+  setPromptText: (value: string) => void;
+  isLoading?: boolean;
   className?: string;
+  hideSubmitBtn?: boolean;
+  onSubmit?: () => void;
 }
-
-export default function AIPromptInput({
-  prompt,
+const PromptInput = ({
+  promptText,
   setPromptText,
   isLoading,
-  onSubmit,
   className,
   hideSubmitBtn = false,
-}: Props) {
+  onSubmit,
+}: PropsType) => {
   return (
-    <div className="relative w-full">
-      <textarea
+    <div className="bg-background">
+      <InputGroup
         className={cn(
-          "min-h-[160px] w-full resize-none rounded-3xl border bg-background px-5 py-4 pr-28 text-base outline-none focus:ring-2 focus:ring-primary",
-          className
+          "min-h-[172px] rounded-3xl bg-background ",
+          className && className
         )}
-        placeholder="I want to design an app that..."
-        value={prompt || ""}
-        onChange={(e) => setPromptText(e.target.value)}
-      />
-
-      {/* Design Button */}
-      <button
-        onClick={onSubmit}
-        disabled={!prompt?.trim() || isLoading}
-        className="absolute bottom-4 right-4 flex items-center gap-1 rounded-full bg-primary px-4 py-2 text-sm font-medium text-white shadow hover:opacity-90 disabled:opacity-50"
       >
-        {isLoading ? (
-          <Spinner className="size-4" />
-        ) : (
-          <>
-            Design
-            <CornerDownLeftIcon className="size-4" />
-          </>
-        )}
-      </button>
+        <InputGroupTextarea
+          className="text-base! py-2.5!"
+          placeholder="I want to design an app that..."
+          value={promptText}
+          onChange={(e) => {
+            setPromptText(e.target.value);
+          }}
+        />
+
+        <InputGroupAddon
+          align="block-end"
+          className="flex items-center justify-end"
+        >
+          {!hideSubmitBtn && (
+            <InputGroupButton
+              variant="default"
+              className=""
+              size="sm"
+              disabled={!promptText?.trim() || isLoading}
+              onClick={() => onSubmit?.()}
+            >
+              {isLoading ? (
+                <Spinner />
+              ) : (
+                <>
+                  Design
+                  <CornerDownLeftIcon className="size-4" />
+                </>
+              )}
+            </InputGroupButton>
+          )}
+        </InputGroupAddon>
+      </InputGroup>
     </div>
   );
-}
+};
+
+export default PromptInput;

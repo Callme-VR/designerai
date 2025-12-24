@@ -1,6 +1,6 @@
 import { useCanvas } from "@/context/canvas-provider";
 import CanvasProvider from "@/context/canvas-provider";
-import FloatingToolBar from "@/context/FloatingToolCanvas";
+import FloatingToolBar from "@/components/canvas/FloatingToolCanvas";
 import { cn } from "@/lib/utils";
 import { Spinner } from "../ui/spinner";
 import { parseThemeColors } from "@/lib/themes";
@@ -47,11 +47,15 @@ export default function CanvasPage({
 }
 
 function CanvasPageContent({ isPending }: { isPending: boolean }) {
-  const { loadingStatus, theme, frames } = useCanvas();
+  const { loadingStatus, theme, frames, selectedFrameId } = useCanvas();
 
   const [toolMode, setToolMode] = useState<ToolModeType>(TOOL_MODE_ENUM.SELECT);
   const [zoomPercent, setZoomPercent] = useState(58);
-  const[onOpenHtmlDialog,setOpenHtmlDialog]=useState(false)
+  const [openHtmlDialog, setOpenHtmlDialog] = useState(false);
+
+  // Get the selected frame for the HtmlDialog
+  const selectedFrame = frames.find((f) => f.id === selectedFrameId);
+
   // Only show loader for AI generation/analysis, not for normal viewing
   const currentStatus = isPending
     ? "Fetching"
@@ -59,9 +63,9 @@ function CanvasPageContent({ isPending }: { isPending: boolean }) {
     ? loadingStatus
     : null;
 
-    const onOpenHtmlDialog=()=>{
-        setOpenHtmlDialog(true)
-    }
+  const handleOpenHtmlDialog = () => {
+    setOpenHtmlDialog(true);
+  };
 
   if (isPending) {
     return (
@@ -72,105 +76,99 @@ function CanvasPageContent({ isPending }: { isPending: boolean }) {
   }
 
   return (
-    <div className="relative h-full w-full overflow-hidden">
-      <FloatingToolBar />
+    <>
+      <div className="relative h-full w-full overflow-hidden">
+        <FloatingToolBar />
 
-      {currentStatus && <CanvasLoader status={currentStatus} />}
+        {currentStatus && <CanvasLoader status={currentStatus} />}
 
-      <TransformWrapper
-        initialScale={0.58}
-        initialPositionX={40}
-        initialPositionY={5}
-        minScale={0.1}
-        maxScale={3}
-        wheel={{ step: 0.1 }}
-        pinch={{ step: 0.1 }}
-        doubleClick={{ disabled: true }}
-        centerOnInit={false}
-        limitToBounds={false}
-        panning={{
-          disabled: toolMode !== TOOL_MODE_ENUM.HAND,
-        }}
-        onTransformed={(ref) => {
-          setZoomPercent(Math.round(ref.instance.transformState.scale * 100));
-        }}
-      >
-        {({ zoomIn, zoomOut }) => (
-          <>
-            <TransformComponent
-              wrapperStyle={{
-                width: "100%",
-                height: "100%",
-                overflow: "unset",
-              }}
-              contentStyle={{
-                width: "100%",
-                height: "100%",
-              }}
-            >
-              <div
-                className={cn(
-                  "w-[3000px] h-[3000px] relative",
-                  toolMode === TOOL_MODE_ENUM.HAND
-                    ? "cursor-grab active:cursor-grabbing"
-                    : "cursor-default"
-                )}
-                style={{
-                  backgroundImage: theme
-                    ? `radial-gradient(circle, ${
-                        parseThemeColors(theme.style)?.primary ??
-                        "var(--primary)"
-                      } 1px, transparent 1px)`
-                    : "radial-gradient(circle, var(--primary) 1px, transparent 1px)",
-                  backgroundSize: "20px 20px",
-                  backgroundColor: theme
-                    ? parseThemeColors(theme.style)?.background ?? "#f8f9fa"
-                    : "#f8f9fa",
+        <TransformWrapper
+          initialScale={0.58}
+          initialPositionX={40}
+          initialPositionY={5}
+          minScale={0.1}
+          maxScale={3}
+          wheel={{ step: 0.1 }}
+          pinch={{ step: 0.1 }}
+          doubleClick={{ disabled: true }}
+          centerOnInit={false}
+          limitToBounds={false}
+          panning={{
+            disabled: toolMode !== TOOL_MODE_ENUM.HAND,
+          }}
+          onTransformed={(ref) => {
+            setZoomPercent(Math.round(ref.instance.transformState.scale * 100));
+          }}
+        >
+          {({ zoomIn, zoomOut }) => (
+            <>
+              <TransformComponent
+                wrapperStyle={{
+                  width: "100%",
+                  height: "100%",
+                  overflow: "unset",
+                }}
+                contentStyle={{
+                  width: "100%",
+                  height: "100%",
                 }}
               >
-                {frames.map((frame, index) => (
-                  <DeviceFrames
-                    key={frame.id}
-                    frameId={frame.id}
-                    html={frame.htmlContent}
-                    title={frame.name}
-                    initialPosition={{ x: 100 + index * 450, y: 100 }}
-                    scale={zoomPercent / 100}
-                    toolMode={toolMode}
-                    theme_style={theme?.style}
-                    onOpenHtmlDialog={onOpenHtmlDialog}
-                  />
-                  if(frames.isLoading){
-                    return(
-                      <DeviceFrameSkeleton key={index}
-                      style={{
-                        tranform:`translate(${100 + index * 450}px, ${100}px)`
-                      }} />
-                    )
-                  }
-                ))}
-              </div>
+                <div
+                  className={cn(
+                    "w-[3000px] h-[3000px] relative",
+                    toolMode === TOOL_MODE_ENUM.HAND
+                      ? "cursor-grab active:cursor-grabbing"
+                      : "cursor-default"
+                  )}
+                  style={{
+                    backgroundImage: theme
+                      ? `radial-gradient(circle, ${
+                          parseThemeColors(theme.style)?.primary ??
+                          "var(--primary)"
+                        } 1px, transparent 1px)`
+                      : "radial-gradient(circle, var(--primary) 1px, transparent 1px)",
+                    backgroundSize: "20px 20px",
+                    backgroundColor: theme
+                      ? parseThemeColors(theme.style)?.background ?? "#f8f9fa"
+                      : "#f8f9fa",
+                  }}
+                >
+                  {frames.map((frame, index) => (
+                    <DeviceFrames
+                      key={frame.id}
+                      frameId={frame.id}
+                      html={frame.htmlContent}
+                      title={frame.name}
+                      initialPosition={{ x: 100 + index * 450, y: 100 }}
+                      scale={zoomPercent / 100}
+                      toolMode={toolMode}
+                      theme_style={theme?.style}
+                      onOpenHtmlDialog={handleOpenHtmlDialog}
+                    />
+                  ))}
+                </div>
+              </TransformComponent>
 
-            </TransformComponent>
+              <CanvasControl
+                zoomIn={zoomIn}
+                zoomOut={zoomOut}
+                zoomPercent={zoomPercent}
+                toolMode={toolMode}
+                setToolMode={setToolMode}
+              />
+            </>
+          )}
+        </TransformWrapper>
+      </div>
 
-            <CanvasControl
-              zoomIn={zoomIn}
-              zoomOut={zoomOut}
-              zoomPercent={zoomPercent}
-              toolMode={toolMode}
-              setToolMode={setToolMode}
-            />
-          </>
-        )}
-      </TransformWrapper>
-    </div>
-    <HtmlDialog html={selectFrame?.htmlContent || DEMO_HTML}
-    theme_style={theme?.style}/>
-    open={openHtmlDialog}
-    onchange={setOpenHtmlDialog}
-    />
-<>
-
+      <HtmlDialog
+        html={selectedFrame?.htmlContent || DEMO_HTML}
+        title={selectedFrame?.name || "Preview"}
+        theme_style={theme?.style}
+        open={openHtmlDialog}
+        onOpenChange={setOpenHtmlDialog}
+      />
+    </>
   );
 }
 

@@ -6,6 +6,8 @@ import { cn } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
 import { Rnd } from "react-rnd";
 import FrameToolbar from "./FrameToolbar";
+import { useCanvas } from "@/context/canvas-provider";
+import DeviceFrameSkeleton from "./DeviceFrameSkeleton";
 
 type PropsType = {
   html: string;
@@ -18,6 +20,8 @@ type PropsType = {
   toolMode: ToolModeType;
   theme_style?: string;
   onOpenHtmlDialog: () => void;
+  isLoading?: boolean;
+  projectId?: string;
 };
 
 export default function DeviceFrames({
@@ -31,12 +35,18 @@ export default function DeviceFrames({
   toolMode,
   theme_style,
   onOpenHtmlDialog,
+  isLoading,
+  projectId,
 }: PropsType) {
-  const [selectedFrameId, setSelectedFrameId] = useState<string>("");
+  const { selectedFrameId, setSelectedFrameId, updateFrame } = useCanvas();
+
   const [frameSize, setFrameSize] = useState({
     width: width,
-    minHeight: typeof minHeight === "string" ? parseInt(minHeight) : minHeight,
+    height: minHeight,
   });
+
+  // for handle the handleDownloadpng state
+  // for regenerattion of theproject state using projectid
 
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const isSelected = selectedFrameId === frameId;
@@ -62,28 +72,22 @@ export default function DeviceFrames({
     };
   }, [frameId]);
 
-  const Handle = () => {
-    return (
-      <div className="z-30 h-4 w-4 bg-white border border-blue-600 rounded-full" />
-    );
-  };
-
   return (
     <Rnd
       default={{
         x: initialPosition.x,
         y: initialPosition.y,
-        width: frameSize.width,
-        height: frameSize.minHeight,
+        width,
+        height: frameSize.height,
       }}
       minWidth={width}
       minHeight={minHeight}
       size={{
         width: frameSize.width,
-        height: frameSize.minHeight,
+        height: frameSize.height,
       }}
       disableDragging={toolMode === TOOL_MODE_ENUM.HAND}
-      enableResizing={toolMode === TOOL_MODE_ENUM.SELECT}
+      enableResizing={isSelected && toolMode !== TOOL_MODE_ENUM.HAND}
       scale={scale}
       onClick={(e: any) => {
         e.stopPropagation();
@@ -106,7 +110,7 @@ export default function DeviceFrames({
       onResize={(e, direction, ref) => {
         setFrameSize({
           width: parseInt(ref.style.width),
-          minHeight: parseInt(ref.style.height),
+          height: parseInt(ref.style.height),
         });
       }}
       className={cn(
@@ -122,12 +126,12 @@ export default function DeviceFrames({
       <div className="w-full h-full">
         <FrameToolbar
           title={title}
-          isSelected={isSelected}
-          disabled={toolMode === TOOL_MODE_ENUM.HAND}
+          isSelected={isSelected && toolMode !== TOOL_MODE_ENUM.HAND}
+          disabled={false}
           isDownloading={false}
+          onDownloadPng={() => {}}
           onOpenHtmlDialog={onOpenHtmlDialog}
           scale={scale}
-          onDownloadPng={false}
         />
 
         <div
@@ -135,23 +139,42 @@ export default function DeviceFrames({
             "relative w-full h-auto shadow-md rounded-[36px] overflow-hidden"
           )}
         >
-          <iframe
-            ref={iframeRef}
-            srcDoc={fullHtml}
-            title={title}
-            sandbox="allow-scripts allow-same-origin"
-            style={{
-              width: "100%",
-              minHeight: `${minHeight}px`,
-              height: `${frameSize.minHeight}px`,
-              border: "none",
-              pointerEvents: "none",
-              display: "block",
-              background: "white",
-            }}
-          />
+          <div className="relative bg-white dark:bg-background overflow-hidden">
+            {isLoading ? (
+              <DeviceFrameSkeleton
+                style={{
+                  position: "relative",
+                  width,
+                  minHeight: minHeight,
+                  height: `${frameSize.height}px`,
+                }}
+              />
+            ) : (
+              <iframe
+                ref={iframeRef}
+                srcDoc={fullHtml}
+                title={title}
+                sandbox="allow-scripts allow-same-origin"
+                style={{
+                  width: "100%",
+                  minHeight: `${minHeight}px`,
+                  height: `${frameSize.height}px`,
+                  border: "none",
+                  pointerEvents: "none",
+                  display: "block",
+                  background: "white",
+                }}
+              />
+            )}
+          </div>
         </div>
       </div>
     </Rnd>
   );
 }
+
+const Handle = () => {
+  return (
+    <div className="z-30 h-4 w-4 bg-white border border-blue-600 rounded-full" />
+  );
+};

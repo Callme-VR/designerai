@@ -4,7 +4,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useCanvas } from "./canvas-provider";
+import { useCanvas } from "../../context/canvas-provider";
 import { Button } from "@/components/ui/button";
 import { CameraIcon, Palette, Save, Wand2 } from "lucide-react";
 import AIPromptInput from "@/components/webcomponents/aipromptinput";
@@ -45,7 +45,7 @@ export default function FloatingToolBar() {
                   </p>
                 </div>
                 <AIPromptInput
-                  prompt={prompt}
+                  promptText={prompt}
                   setPromptText={setPromptText}
                   isLoading={false}
                   onSubmit={() => {}}
@@ -125,7 +125,7 @@ export default function FloatingToolBar() {
             </PopoverContent>
           </Popover>
 
-           <Separator className="h-8" orientation="vertical" />
+          <Separator className="h-8" orientation="vertical" />
 
           <div className="flex items-center gap-7">
             <Button
