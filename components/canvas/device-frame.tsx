@@ -3,8 +3,9 @@
 import { TOOL_MODE_ENUM, ToolModeType } from "@/constant/canvas/canvas";
 import { getHTMLWrapper } from "@/lib/frame-wrapper";
 import { cn } from "@/lib/utils";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Rnd } from "react-rnd";
+import FrameToolbar from "./FrameToolbar";
 
 type PropsType = {
   html: string;
@@ -16,6 +17,7 @@ type PropsType = {
   scale: number;
   toolMode: ToolModeType;
   theme_style?: string;
+  onOpenHtmlDialog: () => void;
 };
 
 export default function DeviceFrames({
@@ -28,6 +30,7 @@ export default function DeviceFrames({
   scale = 1,
   toolMode,
   theme_style,
+  onOpenHtmlDialog,
 }: PropsType) {
   const [selectedFrameId, setSelectedFrameId] = useState<string>("");
   const [frameSize, setFrameSize] = useState({
@@ -38,6 +41,26 @@ export default function DeviceFrames({
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const isSelected = selectedFrameId === frameId;
   const fullHtml = getHTMLWrapper(html, title, theme_style, frameId);
+
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (
+        event.data.type === "FRAME_HEIGHT_CHANGE" &&
+        event.data.id === frameId
+      ) {
+        setFrameSize((prev) => {
+          return {
+            ...prev,
+            height: event.data.height,
+          };
+        });
+      }
+    };
+    window.addEventListener("message", handleMessage);
+    return () => {
+      window.removeEventListener("message", handleMessage);
+    };
+  }, [frameId]);
 
   const Handle = () => {
     return (
@@ -97,7 +120,15 @@ export default function DeviceFrames({
       )}
     >
       <div className="w-full h-full">
-        {/* frameToolbar */}
+        <FrameToolbar
+          title={title}
+          isSelected={isSelected}
+          disabled={toolMode === TOOL_MODE_ENUM.HAND}
+          isDownloading={false}
+          onOpenHtmlDialog={onOpenHtmlDialog}
+          scale={scale}
+          onDownloadPng={false}
+        />
 
         <div
           className={cn(
