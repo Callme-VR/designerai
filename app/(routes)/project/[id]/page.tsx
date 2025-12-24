@@ -10,8 +10,8 @@ export default function Page() {
   const params = useParams();
   const id = params.id as string;
   const { data: project, isPending } = useGetProjectById(id);
-  // const frames = project?.frames || [];
-  // const themeId = project?.theme || "";
+  const frames = project?.frames || [];
+  const themeId = project?.theme || "";
   const hasInitialData = frames.length > 0;
 
   if (!isPending && !project) {

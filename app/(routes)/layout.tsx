@@ -3,9 +3,5 @@ export default function Applayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en" suppressContentEditableWarning>
-      <body className="w-full h-auto">{children}</body>
-    </html>
-  );
+  return <>{children}</>;
 }

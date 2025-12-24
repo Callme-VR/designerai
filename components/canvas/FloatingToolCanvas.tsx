@@ -49,7 +49,7 @@ export default function FloatingToolBar() {
                   setPromptText={setPromptText}
                   isLoading={false}
                   onSubmit={() => {}}
-                  hideSubmitBtn={true}
+                  hideSubmitBtn={false}
                   className="min-h-[120px] ring-2 ring-purple-400/20 rounded-xl shadow-none border-muted mb-4"
                 />
                 <Button
