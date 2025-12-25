@@ -4,9 +4,9 @@ import prisma from "@/lib/prisma";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { NextResponse } from "next/server";
 
-export async function POST(request: Request) {
+export async function POST(req: Request) {
   try {
-    const { prompt } = await request.json();
+    const { prompt } = await req.json();
 
     const session = await getKindeServerSession();
     const user = await session.getUser();
@@ -29,16 +29,27 @@ export async function POST(request: Request) {
     });
 
     try {
+      console.log("Sending inngest event with data:", {
+        userId: user.id,
+        projectId: project.id,
+        prompt,
+      });
+      
       await inngest.send({
         name: "ui/generate-screen",
         data: {
           userId: user.id,
           projectId: project.id,
           prompt,
+          frames: [], // Explicitly include empty frames array
         },
       });
+      
+      console.log("Inngest event sent successfully");
     } catch (error) {
       console.error("Failed to trigger inngest function:", error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      throw new Error(`Inngest trigger failed: ${errorMessage}`);
     }
     // trigger inngest function
 

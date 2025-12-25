@@ -1,3 +1,4 @@
+import { fetchRealtimeSubscriptionToken } from "@/app/api/inngest/realtime";
 import { THEME_LIST, ThemeType } from "@/lib/themes";
 import { FrameType } from "@/types/project";
 import {
@@ -5,8 +6,10 @@ import {
   ReactNode,
   useCallback,
   useContext,
+  useEffect,
   useState,
 } from "react";
+import { useInngestSubscription } from "@inngest/realtime/hooks";
 
 export type LoadingStatusType =
   | "idle"
@@ -74,6 +77,32 @@ export default function CanvasProvider({
     setThemeId(id);
   }, []);
 
+  const { freshData } = useInngestSubscription({
+    refreshToken: fetchRealtimeSubscriptionToken,
+  });
+
+  useEffect(()=>{
+    if(!freshData || freshData.length===0) return;
+    freshData.forEach((message)=>{
+      const {data,topic}=message
+
+      if(data.projectId !== projectId) return;
+      
+      
+    })
+  })
+
+
+
+
+
+
+
+
+
+
+
+
   const addFrame = useCallback((frame: FrameType) => {
     setFrames((prevFrames) => [...prevFrames, frame]);
   }, []);
@@ -112,4 +141,6 @@ export const useCanvas = () => {
   const ctx = useContext(CanvasContext);
   if (!ctx) throw new Error("useCanvas must be used within CanvasProvider");
   return ctx;
+};
+
 };
