@@ -1,4 +1,4 @@
-import { fetchRealtimeSubscriptionToken } from "@/app/api/inngest/realtime";
+import { fetchRealtimeSubscriptionToken } from "@/app/actions/realtime";
 import { THEME_LIST, ThemeType } from "@/lib/themes";
 import { FrameType } from "@/types/project";
 import {
@@ -81,27 +81,14 @@ export default function CanvasProvider({
     refreshToken: fetchRealtimeSubscriptionToken,
   });
 
-  useEffect(()=>{
-    if(!freshData || freshData.length===0) return;
-    freshData.forEach((message)=>{
-      const {data,topic}=message
+  useEffect(() => {
+    if (!freshData || freshData.length === 0) return;
+    freshData.forEach((message) => {
+      const { data, topic } = message;
 
-      if(data.projectId !== projectId) return;
-      
-      
-    })
-  })
-
-
-
-
-
-
-
-
-
-
-
+      if (data.projectId !== projectId) return;
+    });
+  });
 
   const addFrame = useCallback((frame: FrameType) => {
     setFrames((prevFrames) => [...prevFrames, frame]);
@@ -141,6 +128,4 @@ export const useCanvas = () => {
   const ctx = useContext(CanvasContext);
   if (!ctx) throw new Error("useCanvas must be used within CanvasProvider");
   return ctx;
-};
-
 };

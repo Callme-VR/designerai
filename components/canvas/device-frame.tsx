@@ -3,11 +3,13 @@
 import { TOOL_MODE_ENUM, ToolModeType } from "@/constant/canvas/canvas";
 import { getHTMLWrapper } from "@/lib/frame-wrapper";
 import { cn } from "@/lib/utils";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Rnd } from "react-rnd";
 import FrameToolbar from "./FrameToolbar";
 import { useCanvas } from "@/context/canvas-provider";
 import DeviceFrameSkeleton from "./DeviceFrameSkeleton";
+import { toast } from "sonner";
+import axios from "axios";
 
 type PropsType = {
   html: string;
@@ -44,6 +46,39 @@ export default function DeviceFrames({
     width: width,
     height: minHeight,
   });
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  const handleDownloadPng = useCallback(async () => {
+    if (isDownloading) return;
+    setIsDownloading(true);
+    try {
+      const response = await axios.post(
+        "/api/screenshot",
+        {
+          html: fullHtml,
+          width: frameSize.width,
+          height: frameSize.height,
+        },
+        {
+          responseType: "blob",
+          validateStatus: (s) => (s >= 200 && s < 300) || s === 304,
+        }
+      );
+      const url = window.URL.createObjectURL(response.data);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${title.replace(/\s+/g, "-").toLowerCase()}
+      -${Date.now()}.png`;
+      link.click();
+      window.URL.revokeObjectURL(url);
+      toast.success("Screenshot downloaded");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to screenshot");
+    } finally {
+      setIsDownloading(false);
+    }
+  }, [frameSize.height, frameSize.width, fullHtml, isDownloading, title]);
 
   // for handle the handleDownloadpng state
   // for regenerattion of theproject state using projectid
@@ -127,9 +162,9 @@ export default function DeviceFrames({
         <FrameToolbar
           title={title}
           isSelected={isSelected && toolMode !== TOOL_MODE_ENUM.HAND}
-          disabled={false}
-          isDownloading={false}
-          onDownloadPng={() => {}}
+          disabled={isDownloading || isLoading}
+          isDownloading={isDownloading}
+          onDownloadPng={handleDownloadPng}
           onOpenHtmlDialog={onOpenHtmlDialog}
           scale={scale}
         />

@@ -15,8 +15,6 @@ Rules:
 - Capitalize properly    
       `,
       prompt,
-      temperature: 0.4,
-      maxOutputTokens: 20, // ✅ FIX
     });
 
     return text?.trim() || "Untitled Project";

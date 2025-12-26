@@ -12,10 +12,28 @@ import { useState } from "react";
 import { parseThemeColors } from "@/lib/themes";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
+import {
+  useGenrateDesignById,
+  useUpdateProject,
+} from "@/features/use-project-id";
+import { Spinner } from "../ui/spinner";
 
-export default function FloatingToolBar() {
+export default function FloatingToolBar({ projectId }: { projectId: string }) {
   const { theme: currentTheme, themes, setTheme } = useCanvas();
   const [prompt, setPromptText] = useState<string>("");
+
+  const { mutate, isPending } = useGenrateDesignById(projectId);
+  const update = useUpdateProject(projectId);
+
+  const handleAiGenration = () => {
+    if (!prompt) return;
+    mutate(prompt);
+  };
+
+  const handleUpdateProject = () => {
+    if (!prompt) return;
+    update.mutate(currentTheme?.id);
+  };
 
   return (
     <div className="fixed top-12 left-1/2 -translate-x-1/2 z-50 mt-4">
@@ -48,13 +66,13 @@ export default function FloatingToolBar() {
                   promptText={prompt}
                   setPromptText={setPromptText}
                   isLoading={false}
-                  onSubmit={() => {}}
+                  onSubmit={handleAiGenration}
                   hideSubmitBtn={false}
                   className="min-h-[120px] ring-2 ring-purple-400/20 rounded-xl shadow-none border-muted mb-4"
                 />
                 <Button
                   className="w-full bg-linear-to-r from-purple-600 to-indigo-600 text-white rounded-xl shadow-lg shadow-purple-200/50 hover:shadow-purple-200/70 hover:from-purple-700 hover:to-indigo-700 transition-all duration-200 font-medium py-3"
-                  onClick={() => {}}
+                  onClick={handleAiGenration}
                 >
                   <Wand2 className="size-4 mr-2" />
                   Generate Design
@@ -144,13 +162,16 @@ export default function FloatingToolBar() {
               className="rounded-xl cursor-pointer bg-linear-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 transition-all duration-200 shadow-lg hover:shadow-xl px-4 py-2.5"
               variant="default"
               size="sm"
-              onClick={() => {
-                // TODO: Implement save functionality
-                console.log("Save clicked");
-              }}
+              onClick={handleUpdateProject}
             >
-              <Save className="size-4 mr-2" />
-              Save
+              {update.isPending ? (
+                <Spinner />
+              ) : (
+                <>
+                  <Save className="size-4 mr-2" />
+                  Save
+                </>
+              )}
             </Button>
           </div>
         </div>

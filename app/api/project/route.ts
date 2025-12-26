@@ -4,10 +4,41 @@ import prisma from "@/lib/prisma";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { NextResponse } from "next/server";
 
+export async function GET() {
+  try {
+    const session = await getKindeServerSession();
+    const user = await session.getUser();
+
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const projects = await prisma.project.findMany({
+      where: {
+        userId: user.id,
+      },
+      take: 15,
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return NextResponse.json({
+      success: true,
+      data: projects,
+    });
+  } catch (error) {
+    console.error("Project creation failed:", error);
+    return NextResponse.json(
+      { error: "Project creation Failed" },
+      { status: 500 }
+    );
+  }
+}
+
 export async function POST(req: Request) {
   try {
     const { prompt } = await req.json();
-
     const session = await getKindeServerSession();
     const user = await session.getUser();
 
@@ -29,29 +60,20 @@ export async function POST(req: Request) {
     });
 
     try {
-      console.log("Sending inngest event with data:", {
-        userId: user.id,
-        projectId: project.id,
-        prompt,
-      });
-      
       await inngest.send({
         name: "ui/generate-screen",
         data: {
           userId: user.id,
           projectId: project.id,
           prompt,
-          frames: [], // Explicitly include empty frames array
         },
       });
-      
-      console.log("Inngest event sent successfully");
     } catch (error) {
       console.error("Failed to trigger inngest function:", error);
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
       throw new Error(`Inngest trigger failed: ${errorMessage}`);
     }
-    // trigger inngest function
 
     return NextResponse.json({
       success: true,
@@ -60,41 +82,6 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error("Project creation failed:", error);
 
-    // ✅ still return a response
-    return NextResponse.json(
-      { error: "Project creation Failed" },
-      { status: 500 }
-    );
-  }
-}
-
-export async function GET(request: Request) {
-  try {
-    const session = await getKindeServerSession();
-    const user = await session.getUser();
-
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const projects = await prisma.project.findMany({
-      where: {
-        userId: user.id,
-      },
-      take: 15,
-      orderBy: {
-        updatedAt: "desc",
-      },
-    });
-
-    return NextResponse.json({
-      success: true,
-      data: projects,
-    });
-  } catch (error) {
-    console.error("Project creation failed:", error);
-
-    // ✅ still return a response
     return NextResponse.json(
       { error: "Project creation Failed" },
       { status: 500 }
